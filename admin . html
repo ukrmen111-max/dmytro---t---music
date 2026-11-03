@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Адміністратор — Дмитро Т.</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:25px;
+  background:#0b0b0c;
+  color:#f5f2eb;
+  font-family:Arial,sans-serif;
+}
+.container{
+  max-width:500px;
+  margin:50px auto;
+  padding:28px;
+  background:#151516;
+  border:1px solid #705a32;
+  border-radius:12px;
+}
+h1{color:#d7b66c;text-align:center}
+p{color:#aaa;text-align:center}
+label{display:block;margin-top:20px;color:#d7b66c}
+input{
+  width:100%;
+  padding:13px;
+  margin-top:8px;
+  background:#222;
+  color:white;
+  border:1px solid #444;
+  border-radius:6px;
+}
+button{
+  width:100%;
+  margin-top:25px;
+  padding:15px;
+  border:0;
+  border-radius:6px;
+  background:#d7b66c;
+  color:#111;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:disabled{opacity:.5}
+#status{margin-top:20px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>ДМИТРО Т.</h1>
+<p>Панель адміністратора</p>
+
+<form id="uploadForm">
+
+<label>Пароль адміністратора</label>
+<input type="password" id="password" required>
+
+<label>Назва пісні</label>
+<input type="text" id="title" required>
+
+<label>Вибрати MP3</label>
+<input type="file" id="audio" accept=".mp3,audio/mpeg" required>
+
+<button type="submit" id="submitBtn">ОПУБЛІКУВАТИ ПІСНЮ</button>
+
+</form>
+
+<div id="status"></div>
+</div>
+
+<script>
+const form = document.getElementById("uploadForm");
+const statusBox = document.getElementById("status");
+const button = document.getElementById("submitBtn");
+
+form.addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const password = document.getElementById("password").value;
+  const title = document.getElementById("title").value.trim();
+  const file = document.getElementById("audio").files[0];
+
+  if(!file || !title || !password){
+    statusBox.textContent = "Заповни всі поля.";
+    return;
+  }
+
+  if(!file.name.toLowerCase().endsWith(".mp3")){
+    statusBox.textContent = "Вибери файл MP3.";
+    return;
+  }
+
+  if(file.size > 3 * 1024 * 1024){
+    statusBox.textContent = "Файл має бути не більшим за 3 МБ.";
+    return;
+  }
+
+  button.disabled = true;
+  statusBox.textContent = "Завантаження пісні...";
+
+  try{
+    const fileBase64 = await new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const response = await fetch(
+      "/.netlify/functions/upload-song",
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          password,
+          title,
+          fileBase64
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if(!response.ok){
+      throw new Error(result.error || "Помилка завантаження.");
+    }
+
+    statusBox.textContent = "Пісню успішно завантажено!";
+    form.reset();
+
+  }catch(error){
+    statusBox.textContent = error.message;
+  }finally{
+    button.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
