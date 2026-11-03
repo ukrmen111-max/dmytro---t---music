@@ -54,7 +54,7 @@ exports.handler = async (event) => {
 
     const content = Buffer.from(fileBase64, "base64");
 
-    if (content.length > 8 * 1024 * 1024) {
+    if (content.length > 3 * 1024 * 1024) {
       return {
         statusCode: 413,
         headers,
