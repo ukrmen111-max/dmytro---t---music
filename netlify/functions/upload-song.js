@@ -1,14 +1,11 @@
-const { Buffer } = require("buffer");
+const OWNER = "ukrmen111";
+const REPO = "dmytro---t---music";
+const BRANCH = "main";
 
 exports.handler = async (event) => {
   const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*"
+    "Content-Type": "application/json"
   };
-
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers };
-  }
 
   if (event.httpMethod !== "POST") {
     return {
@@ -41,51 +38,112 @@ exports.handler = async (event) => {
     }
 
     const title = String(data.title || "").trim();
-    const fileName = String(data.fileName || "");
     const fileBase64 = String(data.fileBase64 || "");
 
-    if (!title || !/^[a-zA-Z0-9.-]+\.mp3$/i.test(fileName) || !fileBase64) {
+    if (!title || !fileBase64) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: "Перевір назву та MP3-файл" })
+        body: JSON.stringify({ error: "Вкажіть назву та виберіть MP3" })
       };
     }
 
     const content = Buffer.from(fileBase64, "base64");
 
-    if (content.length > 3 * 1024 * 1024) {
+    if (
+      content.length < 100 ||
+      content.length > 3 * 1024 * 1024
+    ) {
       return {
         statusCode: 413,
         headers,
-        body: JSON.stringify({ error: "Файл завеликий. Максимум 8 МБ." })
+        body: JSON.stringify({ error: "MP3 має бути не більшим за 3 МБ" })
       };
     }
 
-    const safeName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const path = `media/${Date.now()}-${safeName}`;
-    const url = `https://api.github.com/repos/ukrmen111/dmytro---t---music/contents/${path}`;
+    const isMp3 =
+      content.subarray(0, 3).toString() === "ID3" ||
+      (content[0] === 0xff && (content[1] & 0xe0) === 0xe0);
 
-    const response = await fetch(url, {
+    if (!isMp3) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: "Це не схоже на MP3-файл" })
+      };
+    }
+
+    const api = `https://api.github.com/repos/${OWNER}/${REPO}/contents/`;
+    const authHeaders = {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+
+    const path = `media/song-${Date.now()}.mp3`;
+
+    const upload = await fetch(api + path, {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28"
+        ...authHeaders,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         message: `Додано пісню: ${title}`,
         content: content.toString("base64"),
-        branch: "main"
+        branch: BRANCH
       })
     });
 
-    if (!response.ok) {
-      return {
-        statusCode: 502,
-        headers,
-        body: JSON.stringify({ error: "GitHub не прийняв файл" })
-      };
+    if (!upload.ok) {
+      throw new Error("Не вдалося завантажити MP3 у GitHub");
+    }
+
+    const catalogResponse = await fetch(api + "songs.json", {
+      headers: authHeaders
+    });
+
+    let songs = [];
+    let sha;
+
+    if (catalogResponse.ok) {
+      const catalog = await catalogResponse.json();
+      sha = catalog.sha;
+      songs = JSON.parse(
+        Buffer.from(catalog.content, "base64").toString("utf8")
+      );
+    } else if (catalogResponse.status !== 404) {
+      throw new Error("Не вдалося прочитати каталог");
+    } else {
+      songs = [{
+        title: "Святе військо",
+        path: "media/Святе військо.mp3"
+      }];
+    }
+
+    songs.push({
+      title,
+      path
+    });
+
+    const saveCatalog = await fetch(api + "songs.json", {
+      method: "PUT",
+      headers: {
+        ...authHeaders,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: `Оновлено каталог: ${title}`,
+        content: Buffer.from(
+          JSON.stringify(songs, null, 2)
+        ).toString("base64"),
+        branch: BRANCH,
+        ...(sha ? { sha } : {})
+      })
+    });
+
+    if (!saveCatalog.ok) {
+      throw new Error("MP3 завантажено, але каталог не оновився");
     }
 
     return {
@@ -93,15 +151,15 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: true,
-        title,
-        path
+        title
       })
     };
+
   } catch (error) {
     return {
-      statusCode: 400,
+      statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Не вдалося обробити файл" })
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
