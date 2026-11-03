@@ -96,7 +96,11 @@ exports.handler = async (event) => {
     });
 
     if (!upload.ok) {
-      throw new Error("Не вдалося завантажити MP3 у GitHub");
+  const details = await upload.text();
+  throw new Error(
+    `GitHub ${upload.status}: ${details}`
+  );
+}
     }
 
     const catalogResponse = await fetch(api + "songs.json", {
