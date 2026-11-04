@@ -52,12 +52,12 @@ exports.handler = async (event) => {
 
     if (
       content.length < 100 ||
-      content.length > 3 * 1024 * 1024
+      content.length > 4 * 1024 * 1024
     ) {
       return {
         statusCode: 413,
         headers,
-        body: JSON.stringify({ error: "MP3 має бути не більшим за 3 МБ" })
+        body: JSON.stringify({ error: "MP3 має бути не більшим за 4 МБ" })
       };
     }
 
