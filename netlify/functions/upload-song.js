@@ -101,8 +101,6 @@ exports.handler = async (event) => {
     `GitHub ${upload.status}: ${details}`
   );
 }
-    }
-
     const catalogResponse = await fetch(api + "songs.json", {
       headers: authHeaders
     });
