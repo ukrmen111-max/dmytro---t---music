@@ -1,162 +1,272 @@
-I i<!doctype html>
-<html lang="uk">  
+<!DOCTYPE html>
+<html lang="uk">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101010">
-<title>Дмитро Т.  — Official Music</title>
+<title>Адміністратор — Дмитро Т.</title>
+
 <style>
-:root {
-  --bg: #10091b;
-  --panel: #1b1128;
-  --gold: #c9b8e8;
-  --muted: #aaa2b8;
-  --line: #49345f;
-}
- { box-sizing: border-box; } 
-body {
-  margin: 0;
-  background: linear-gradient(180deg,#10091b,#09070e 65%,#180d25);
-  background-attachment: fixed;
-  color: #f5f0ff;
-  font-family: Arial,sans-serif;
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:25px;
+  background:#10091b;
+  color:#f5f0ff;
+  font-family:Arial,sans-serif;
 }
 
-header:not(.main-banner) {
-  background: #170d24;
-  border-bottom: 1px solid #755b91;
+.container{
+  max-width:500px;
+  margin:40px auto;
+  padding:28px;
+  background:#1b1128;
+  border:1px solid silver;
+  border-radius:14px;
 }
 
-.brand {
-  color: #d8c9f0;
-  font-weight: 800;
+h1{
+  color:#d8c9f0;
+  text-align:center;
 }
 
-nav { color: #ddd0ed; }
-nav a { color: inherit; }
-
-.hero {
-  min-height: 460px;
-  padding: 85px 8%;
-  display: flex;
-  align-items: center;
-  background: radial-gradient(ellipse at 75% 45%,#663b8066,transparent 42%),linear-gradient(120deg,#10091b,#241334);
+p{
+  color:#aaa2b8;
+  text-align:center;
 }
 
-.eyebrow { color: #c9b8e8; }
-
-h1,h2,h3 {
-  color: #e5d9f5;
-  text-shadow: 0 0 12px #704a91;
+label{
+  display:block;
+  margin-top:20px;
+  color:#c9b8e8;
 }
 
-.hero p { color: #c4b9d2; }
-
-.btn {
-  background: linear-gradient(135deg,#a987d0,#68418e);
-  color: white;
-  border: 1px solid silver;
+input{
+  width:100%;
+  padding:13px;
+  margin-top:8px;
+  background:#222;
+  color:white;
+  border:1px solid #755b91;
+  border-radius:6px;
 }
 
-section { padding: 68px 8%; }
-
-.track {
-  background: #1b1128;
-  border: 1px solid #755b91;
-  border-radius: 14px;
-  padding: 22px;
-  box-shadow: 0 0 18px #482b6133;
+button{
+  width:100%;
+  margin-top:25px;
+  padding:15px;
+  border:1px solid silver;
+  border-radius:6px;
+  background:linear-gradient(135deg,#a987d0,#68418e);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.cover {
-  background: radial-gradient(circle,#54376e,#10091b 70%);
-  border: 1px solid silver;
-  color: #e0d0f5;
+button:disabled{opacity:.5}
+
+#status{
+  margin-top:20px;
+  text-align:center;
+  overflow-wrap:anywhere;
 }
 
-.track p { color: #b9adc9; }
-
-audio {
-  width: 100%;
-  accent-color: #a987d0;
+#preview{
+  display:none;
+  width:180px;
+  height:180px;
+  object-fit:cover;
+  margin:18px auto 0;
+  border:2px solid silver;
+  border-radius:12px;
 }
 
-.about { background: #130b1e; }
-.about p { color: #c4b9d2; }
-
-footer {
-  background: #0b0711;
-  border-top: 1px solid #49345f;
-  color: #aaa2b8;
-}
-
-@media(max-width:650px) {
-  header:not(.main-banner) { padding: 0 5%; }
-  nav { gap: 12px; font-size: 10px; }
-  .hero { padding: 70px 6%; }
-  .track { grid-template-columns: 1fr; }
-  .cover { max-width: 190px; }
-  .track h3 { font-size: 21px; }
-  section { padding: 54px 6%; }
+.note{
+  font-size:12px;
+  text-align:left;
 }
 </style>
 </head>
+
 <body>
-  <header class="main-banner">
-  <img src="media/banner.png.jpg" alt="Дмитро Т. Official Music">
-</header>
 
-<style>
-.main-banner {
-  width: 100%;
-  overflow: hidden;
-  background: #170b2d;
-  border-bottom: 2px solid silver;
-}
+<div class="container">
 
-.main-banner img {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-</style>
-<header><a class="brand" href="#">ДМИТРО Т.</a><nav><a href="#music">МУЗИКА</a><a href="#about">ПРО АВТОРА</a></nav></header>
-<main>
-<section class="hero"><div><div class="eyebrow">Офіційний музичний сайт</div><h1>ДМИТРО <span>Т.</span></h1><p>Музика. Емоції. Історії. Пісні, у яких живуть почуття, темрява, світло та справжні історії.</p><a class="btn" href="#music">СЛУХАТИ МУЗИКУ</a></div></section>
-<section id="music"><div class="head"><div class="eyebrow">Твоя музична бібліотека</div><h2>Мої треки</h2></div>
-<div id="songs-list"></div>
+<h1>ДМИТРО Т.</h1>
+<p>Панель адміністратора</p>
 
-</section>
-<section class="about" id="about">
-</section>
-<section class="about" id="about"><div class="eyebrow">За кожною піснею — історія</div><h2>Про Дмитра Т.</h2><p>Авторський музичний проєкт, у якому поєднуються різні жанри, настрої та сюжети. Від енергійних ритмів до рокових історій і ліричних композицій. Тут кожна пісня має власний характер.</p></section>
-</main>
-<footer>© 2026 ДМИТРО Т. Усі права захищені.</footer>
+<form id="uploadForm">
+
+<label>Пароль адміністратора</label>
+<input type="password" id="password" required>
+
+<label>Назва пісні</label>
+<input type="text" id="title" required>
+
+<label>Вибрати MP3</label>
+<input type="file" id="audio"
+accept=".mp3,audio/mpeg" required>
+<p class="note">Максимальний розмір MP3 — 4 МБ.</p>
+
+<label>Обкладинка пісні</label>
+<input type="file" id="cover"
+accept="image/jpeg,image/png,image/webp" required>
+
+<p class="note">JPG, PNG або WEBP. Максимум 5 МБ.</p>
+
+<img id="preview" alt="Попередній перегляд обкладинки">
+
+<button type="submit" id="submitBtn">
+ОПУБЛІКУВАТИ ПІСНЮ
+</button>
+
+</form>
+
+<div id="status"></div>
+
+</div>
+
 <script>
-fetch('songs.json')
-  .then(response => response.json())
-  .then(songs => {
-    const list = document.getElementById('songs-list');
+const form = document.getElementById("uploadForm");
+const statusBox = document.getElementById("status");
+const button = document.getElementById("submitBtn");
+const coverInput = document.getElementById("cover");
+const preview = document.getElementById("preview");
 
-    songs.forEach(song => {
-      const article = document.createElement('article');
-      article.className = 'track';
+coverInput.addEventListener("change", function(){
 
-      article.innerHTML = `
-        <div class="cover">ДТ</div>
-        <div>
-          <h3>${song.title}</h3>
-          <p>ДМИТРО Т. · MP3</p>
-          <audio controls preload="metadata">
-            <source src="${song.file}" type="audio/mpeg">
-          </audio>
-        </div>
-      `;
+  const file = this.files[0];
 
-      list.appendChild(article);
-    });
+  if(!file){
+    preview.style.display = "none";
+    return;
+  }
+
+  const allowed = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
+
+  if(!allowed.includes(file.type) ||
+     file.size > 5 * 1024 * 1024){
+
+    statusBox.textContent =
+      "Вибери JPG, PNG або WEBP до 5 МБ.";
+
+    this.value = "";
+    preview.style.display = "none";
+    return;
+  }
+
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+  statusBox.textContent = "";
+});
+
+function readBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+
+    reader.onload = () =>
+      resolve(reader.result.split(",")[1]);
+
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
   });
-</script> 
+}
+
+form.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+  const password =
+    document.getElementById("password").value;
+
+  const title =
+    document.getElementById("title").value.trim();
+
+  const audio =
+    document.getElementById("audio").files[0];
+
+  const cover = coverInput.files[0];
+
+  if(!password || !title || !audio || !cover){
+    statusBox.textContent =
+      "Заповни всі поля та вибери обидва файли.";
+    return;
+  }
+
+  if(!audio.name.toLowerCase().endsWith(".mp3") ||
+     audio.size > 4 * 1024 * 1024){
+
+    statusBox.textContent =
+      "MP3 повинен бути не більшим за 4 МБ.";
+    return;
+  }
+
+  if(
+    !["image/jpeg","image/png","image/webp"].includes(cover.type) ||
+    cover.size > 5 * 1024 * 1024
+  ){
+    statusBox.textContent =
+      "Обкладинка повинна бути JPG, PNG або WEBP до 5 МБ.";
+    return;
+  }
+
+  button.disabled = true;
+  statusBox.textContent = "Завантаження пісні та обкладинки...";
+
+  try{
+
+    const fileBase64 = await readBase64(audio);
+    const coverBase64 = await readBase64(cover);
+
+    const response = await fetch(
+      "/.netlify/functions/upload-song",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          password,
+          title,
+          fileBase64,
+          coverBase64,
+          coverType:cover.type
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if(!response.ok){
+      throw new Error(
+        result.error || "Помилка завантаження."
+      );
+    }
+
+    statusBox.textContent =
+      "Пісню та обкладинку успішно завантажено!";
+
+    form.reset();
+    preview.style.display = "none";
+    preview.removeAttribute("src");
+
+  }catch(error){
+
+    statusBox.textContent = error.message;
+
+  }finally{
+
+    button.disabled = false;
+
+  }
+
+});
+</script>
+
 </body>
 </html>
