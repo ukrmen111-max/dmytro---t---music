@@ -94,8 +94,8 @@ form.addEventListener("submit", async function(e){
     return;
   }
 
-  if(file.size > 3 * 1024 * 1024){
-    statusBox.textContent = "Файл має бути не більшим за 3 МБ.";
+  if(file.size > 4 * 1024 * 1024){
+    statusBox.textContent = "Файл має бути не більшим за 4 МБ.";
     return;
   }
 
