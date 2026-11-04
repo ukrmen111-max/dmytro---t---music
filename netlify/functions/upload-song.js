@@ -40,25 +40,21 @@ exports.handler = async (event) => {
     const title = String(data.title || "").trim();
     const fileBase64 = String(data.fileBase64 || "");
     const coverBase64 = String(data.coverBase64 || "");
-    const coverType = String(data.coverType || "");
+    const coverType = String(data.coverType || "").toLowerCase();
 
-    if (!title || !fileBase64 || !coverBase64) {
+    if (!title || !fileBase64) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: "Вкажіть назву, MP3 та обкладинку"
+          error: "Вкажіть назву та виберіть MP3"
         })
       };
     }
 
     const content = Buffer.from(fileBase64, "base64");
-    const cover = Buffer.from(coverBase64, "base64");
 
-    if (
-      content.length < 100 ||
-      content.length > 4 * 1024 * 1024
-    ) {
+    if (content.length < 100 || content.length > 4 * 1024 * 1024) {
       return {
         statusCode: 413,
         headers,
@@ -76,55 +72,13 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: "Це не схоже на MP3-файл" })
-      };
-    }
-
-    if (
-      cover.length < 100 ||
-      cover.length > 5 * 1024 * 1024
-    ) {
-      return {
-        statusCode: 413,
-        headers,
         body: JSON.stringify({
-          error: "Обкладинка має бути не більшою за 5 МБ"
+          error: "Це не схоже на MP3-файл"
         })
       };
     }
 
-    const formats = {
-      "image/jpeg": {
-        ext: "jpg",
-        signature: cover.subarray(0, 3).toString("hex") === "ffd8ff"
-      },
-      "image/png": {
-        ext: "png",
-        signature: cover.subarray(0, 8).toString("hex") ===
-          "89504e470d0a1a0a"
-      },
-      "image/webp": {
-        ext: "webp",
-        signature:
-          cover.subarray(0, 4).toString() === "RIFF" &&
-          cover.subarray(8, 12).toString() === "WEBP"
-      }
-    };
-
-    const format = formats[coverType];
-
-    if (!format || !format.signature) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: "Обкладинка повинна бути JPG, PNG або WEBP"
-        })
-      };
-    }
-
-    const api =
-      `https://api.github.com/repos/${OWNER}/${REPO}/contents/`;
+    const api = `https://api.github.com/repos/${OWNER}/${REPO}/contents/`;
 
     const authHeaders = {
       Authorization: `Bearer ${token}`,
@@ -132,51 +86,64 @@ exports.handler = async (event) => {
       "X-GitHub-Api-Version": "2022-11-28"
     };
 
-    const timestamp = Date.now();
+    const uploadFile = async (path, buffer, message) => {
+      const response = await fetch(api + path, {
+        method: "PUT",
+        headers: {
+          ...authHeaders,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message,
+          content: buffer.toString("base64"),
+          branch: BRANCH
+        })
+      });
 
-    const path = `media/song-${timestamp}.mp3`;
-    const coverPath =
-      `media/covers/cover-${timestamp}.${format.ext}`;
+      if (!response.ok) {
+        throw new Error(`GitHub ${response.status}: ${await response.text()}`);
+      }
+    };
 
-    // Завантажуємо MP3
-    const upload = await fetch(api + path, {
-      method: "PUT",
-      headers: {
-        ...authHeaders,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: `Додано пісню: ${title}`,
-        content: content.toString("base64"),
-        branch: BRANCH
-      })
-    });
+    const songPath = `media/song-${Date.now()}.mp3`;
 
-    if (!upload.ok) {
-      throw new Error(`Помилка завантаження MP3: ${upload.status}`);
-    }
+    await uploadFile(
+      songPath,
+      content,
+      `Додано пісню: ${title}`
+    );
 
-    // Завантажуємо обкладинку
-    const coverUpload = await fetch(api + coverPath, {
-      method: "PUT",
-      headers: {
-        ...authHeaders,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: `Додано обкладинку: ${title}`,
-        content: cover.toString("base64"),
-        branch: BRANCH
-      })
-    });
+    let coverPath = "";
 
-    if (!coverUpload.ok) {
-      throw new Error(
-        `MP3 завантажено, але обкладинка не завантажилась: ${coverUpload.status}`
+    if (coverBase64) {
+      const extensions = {
+        "image/jpeg": "jpg",
+        "image/jpg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+      };
+
+      const extension = extensions[coverType];
+
+      if (!extension) {
+        throw new Error("Обкладинка має бути JPG, PNG або WEBP");
+      }
+
+      const cover = Buffer.from(coverBase64, "base64");
+
+      if (cover.length > 1024 * 1024) {
+        throw new Error("Обкладинка має бути не більшою за 1 МБ");
+      }
+
+      coverPath = `media/cover-${Date.now()}.${extension}`;
+
+      await uploadFile(
+        coverPath,
+        cover,
+        `Додано обкладинку: ${title}`
       );
     }
 
-    // Читаємо каталог пісень
     const catalogResponse = await fetch(api + "songs.json", {
       headers: authHeaders
     });
@@ -192,22 +159,16 @@ exports.handler = async (event) => {
         Buffer.from(catalog.content, "base64").toString("utf8")
       );
     } else if (catalogResponse.status !== 404) {
-      throw new Error("Не вдалося прочитати каталог");
-    } else {
-      songs = [{
-        title: "Святе військо",
-        path: "media/Святе військо.mp3"
-      }];
+      throw new Error("Не вдалося прочитати каталог пісень");
     }
 
-    // Додаємо нову пісню та її обкладинку
     songs.push({
       title,
-      path,
+      file: songPath,
+      path: songPath,
       cover: coverPath
     });
 
-    // Зберігаємо каталог
     const saveCatalog = await fetch(api + "songs.json", {
       method: "PUT",
       headers: {
@@ -225,9 +186,7 @@ exports.handler = async (event) => {
     });
 
     if (!saveCatalog.ok) {
-      throw new Error(
-        "Файли завантажено, але каталог не оновився"
-      );
+      throw new Error("Пісню завантажено, але каталог не оновився");
     }
 
     return {
@@ -236,7 +195,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         title,
-        path,
+        file: songPath,
         cover: coverPath
       })
     };
@@ -245,7 +204,9 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({
+        error: error.message
+      })
     };
   }
 };
