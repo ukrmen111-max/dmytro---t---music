@@ -1,30 +1,104 @@
 I i<!doctype html>
-<html lang="uk">
-  
+<html lang="uk">  
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101010">
 <title>Дмитро Т.  — Official Music</title>
 <style>
-:root{--bg:#0b0b0c;--panel:#151516;--gold:#d7b66c;--muted:#aaa;--line:#34302a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f5f2eb;font-family:Arial,sans-serif}
-header{min-height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 7%;border-bottom:1px solid #242424;background:#0b0b0cf2}
-.brand{font-weight:800;letter-spacing:.12em;color:var(--gold);font-size:19px}
-nav{display:flex;gap:24px;color:#ccc;font-size:12px}nav a{color:inherit;text-decoration:none}
-.hero{min-height:460px;padding:85px 8%;display:flex;align-items:center;background:radial-gradient(ellipse at 75% 45%,#40331d66,transparent 42%),linear-gradient(120deg,#0b0b0c 45%,#191612)}
-.eyebrow{color:var(--gold);letter-spacing:.25em;font-size:11px;text-transform:uppercase}
-h1{font-size:clamp(54px,10vw,108px);line-height:.95;margin:22px 0;letter-spacing:-.055em}h1 span{color:var(--gold)}
-.hero p{color:#bcb8b0;font-size:18px;line-height:1.7;max-width:520px}
-.btn{display:inline-block;margin-top:22px;padding:14px 22px;background:var(--gold);color:#111;text-decoration:none;font-size:12px;font-weight:bold}
-section{padding:68px 8%}.head{margin-bottom:28px}h2{font-size:30px;margin:9px 0}
-.track{max-width:760px;background:var(--panel);border:1px solid #393226;padding:22px;display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center}
-.cover{aspect-ratio:1;background:radial-gradient(circle,#4a3820,#111 70%);border:1px solid #705a32;display:grid;place-items:center;color:var(--gold);font-size:30px;font-weight:800;letter-spacing:.1em}
-.track h3{font-size:23px;margin:0 0 7px}.track p{color:var(--muted);font-size:13px;margin:0 0 17px}
-audio{width:100%;accent-color:var(--gold)}
-.about{background:#111}.about p{max-width:720px;color:#bbb;line-height:1.8}
-footer{padding:28px 8%;border-top:1px solid #282828;color:#777;font-size:12px}
-@media(max-width:650px){header{padding:0 5%}nav{gap:12px;font-size:10px}.hero{padding:70px 6%}.track{grid-template-columns:1fr}.cover{max-width:190px}.track h3{font-size:21px}section{padding:54px 6%}}
+:root {
+  --bg: #10091b;
+  --panel: #1b1128;
+  --gold: #c9b8e8;
+  --muted: #aaa2b8;
+  --line: #49345f;
+}
+ { box-sizing: border-box; } 
+body {
+  margin: 0;
+  background: linear-gradient(180deg,#10091b,#09070e 65%,#180d25);
+  background-attachment: fixed;
+  color: #f5f0ff;
+  font-family: Arial,sans-serif;
+}
+
+header:not(.main-banner) {
+  background: #170d24;
+  border-bottom: 1px solid #755b91;
+}
+
+.brand {
+  color: #d8c9f0;
+  font-weight: 800;
+}
+
+nav { color: #ddd0ed; }
+nav a { color: inherit; }
+
+.hero {
+  min-height: 460px;
+  padding: 85px 8%;
+  display: flex;
+  align-items: center;
+  background: radial-gradient(ellipse at 75% 45%,#663b8066,transparent 42%),linear-gradient(120deg,#10091b,#241334);
+}
+
+.eyebrow { color: #c9b8e8; }
+
+h1,h2,h3 {
+  color: #e5d9f5;
+  text-shadow: 0 0 12px #704a91;
+}
+
+.hero p { color: #c4b9d2; }
+
+.btn {
+  background: linear-gradient(135deg,#a987d0,#68418e);
+  color: white;
+  border: 1px solid silver;
+}
+
+section { padding: 68px 8%; }
+
+.track {
+  background: #1b1128;
+  border: 1px solid #755b91;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 0 18px #482b6133;
+}
+
+.cover {
+  background: radial-gradient(circle,#54376e,#10091b 70%);
+  border: 1px solid silver;
+  color: #e0d0f5;
+}
+
+.track p { color: #b9adc9; }
+
+audio {
+  width: 100%;
+  accent-color: #a987d0;
+}
+
+.about { background: #130b1e; }
+.about p { color: #c4b9d2; }
+
+footer {
+  background: #0b0711;
+  border-top: 1px solid #49345f;
+  color: #aaa2b8;
+}
+
+@media(max-width:650px) {
+  header:not(.main-banner) { padding: 0 5%; }
+  nav { gap: 12px; font-size: 10px; }
+  .hero { padding: 70px 6%; }
+  .track { grid-template-columns: 1fr; }
+  .cover { max-width: 190px; }
+  .track h3 { font-size: 21px; }
+  section { padding: 54px 6%; }
+}
 </style>
 </head>
 <body>
